@@ -9,10 +9,10 @@ bool go = true;
 Console.WriteLine("------- MENU -------");
 Console.WriteLine("Seleziona un'opzione:");
 Console.WriteLine("1. Inserisci un nuovo giocatore: ");
-Console.WriteLine("2. Cerca un giocatore per nome: ");
-Console.WriteLine("3. Cerca un giocatore per id: ");
-Console.WriteLine("4. Modifica un giocatore: ");
-Console.WriteLine("5. Cancella un giocatore: ");
+Console.WriteLine("2. Cerca un giocatore per id: ");
+Console.WriteLine("3. Cerca un giocatore per nome: ");
+Console.WriteLine("4. Modifica un giocatore tramite id: ");
+Console.WriteLine("5. Inserire una nuova squadra: ");
 Console.WriteLine("6. Esci");
 
 Console.WriteLine("Inserisci l'opzione desiderata: ");
@@ -70,17 +70,66 @@ switch (response)
         }
         break;
 
+    case 4:
+        Console.Write("Inserire id: ");
+        int playerIdToModify = int.Parse(Console.ReadLine());
 
+        using (PlayerContext db = new PlayerContext())
+        {
+            if (db.Players.Where(player => player.PlayerId == playerIdToModify).Any())
+            {
+                Player playerToModify = db.Players.Where(player => player.PlayerId == playerIdToModify).First();
 
+                Console.Write("Inserire le partite giocate: ");
+                int newPartita = int.Parse(Console.ReadLine());
 
-       /*
-    case 6:
-        Console.WriteLine("Grazie e arrivederci!");
-        go = false;
+                Console.Write("Inserire il punteggio: ");
+                int newPunteggio = int.Parse(Console.ReadLine());
+
+                playerToModify.PartiteGiocate = newPartita;
+                playerToModify.Punteggio = newPunteggio;
+
+                db.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine("Non è stato trovato nessun giocatore con id = " + playerIdToModify);
+            }
+        }
 
         break;
 
-    default:
-        Console.WriteLine("Non hai inserito un'opzione valida: ritenta.");
-        break;*/
+    case 5:
+
+        Console.Write("Inserire il nome della squadra: ");
+        string teamNome = Console.ReadLine();
+
+        Console.WriteLine("Inserire la città della squadra: ");
+        string citta = Console.ReadLine();
+
+        Console.WriteLine("Inserire il nome dell'allenatore: ");
+        string allenatore = Console.ReadLine();
+
+        Console.WriteLine("Inserire i colori della squadra: ");
+        string colori = Console.ReadLine();
+
+        using (PlayerContext db = new PlayerContext())
+        {
+            Team newTeam = new Team(teamNome, citta, allenatore, colori);
+
+            db.Add(newTeam);
+            db.SaveChanges();
+        }
+
+        break;
+
+     case 6:
+         Console.WriteLine("Arrivederci e grazie!!!!");
+         go = false;
+
+         break;
+
+     default:
+         Console.WriteLine("Non hai inserito un'opzione valida: ritenta.");
+         break;
 }
